@@ -1,0 +1,44 @@
+{
+  "agent_name": "Repository Code Reviewer",
+  "agent_id": "69a289aabb857be96e3e208c",
+  "description": "Reads actual repository code files, directory structures, configuration files, and cross-references them with PR diffs or commit history to produce a factual, evidence-based analysis of the codebase \u2014 including real technology stack, actual API endpoints, genuine configuration, and true project architecture.",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "code_review": {
+      "technology_stack": {
+        "languages": "string",
+        "frameworks": "string",
+        "databases": "string",
+        "infrastructure": "string",
+        "manifest_files_read": "string"
+      },
+      "api_endpoints": "string",
+      "project_architecture": "string",
+      "configuration": "string",
+      "development_patterns": "string",
+      "dependencies_summary": "string",
+      "files_reviewed": "string",
+      "directory_structure": "string"
+    }
+  },
+  "example_response": {
+    "code_review": {
+      "technology_stack": {
+        "languages": "sample string",
+        "frameworks": "sample string",
+        "databases": "sample string",
+        "infrastructure": "sample string",
+        "manifest_files_read": "sample string"
+      },
+      "api_endpoints": "sample string",
+      "project_architecture": "sample string",
+      "configuration": "sample string",
+      "development_patterns": "sample string",
+      "dependencies_summary": "sample string",
+      "files_reviewed": "sample string",
+      "directory_structure": "sample string"
+    }
+  }
+}

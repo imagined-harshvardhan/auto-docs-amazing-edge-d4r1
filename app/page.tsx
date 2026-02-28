@@ -90,7 +90,9 @@ const NAV_ITEMS: { key: Screen; label: string; Icon: React.ComponentType<{ class
 const AGENTS = [
   { id: COORDINATOR_AGENT_ID, name: 'Documentation Coordinator', purpose: 'Analyzes PR diffs and generates documentation' },
   { id: PUBLISHER_AGENT_ID, name: 'Documentation Publisher', purpose: 'Commits documentation updates to repository' },
-  { id: ONBOARDING_AGENT_ID, name: 'Repository Onboarding', purpose: 'Generates project docs from PR history' },
+  { id: ONBOARDING_AGENT_ID, name: 'Onboarding Coordinator', purpose: 'Orchestrates code review and doc generation' },
+  { id: '69a289aabb857be96e3e208c', name: 'Code Reviewer', purpose: 'Reads actual repo source code via GitHub' },
+  { id: '69a289abbb857be96e3e208e', name: 'Onboarding Doc Writer', purpose: 'Writes docs from verified code analysis' },
 ]
 
 export default function Page() {
@@ -230,10 +232,28 @@ export default function Page() {
 
       const sourceLabel = config.sourceMode === 'commits' ? 'commits' : 'closed PRs'
       const sourceInstruction = config.sourceMode === 'commits'
-        ? `Source Mode: commits\nIMPORTANT: This repository may have no pull requests. Read the recent commit history directly instead. Analyze commit messages, changed files, and patterns in the last ${config.prCount} commits to build documentation.\n\nNumber of recent commits to analyze: ${config.prCount}`
+        ? `Source Mode: commits\nIMPORTANT: This repository may have no pull requests. Read the recent commit history directly instead. Analyze commit messages, changed files, and patterns in the last ${config.prCount} commits.\n\nNumber of recent commits to analyze: ${config.prCount}`
         : `Source Mode: pull_requests\nNumber of recent closed PRs to analyze: ${config.prCount}`
 
-      const message = `Analyze the repository and generate comprehensive project documentation for onboarding.\n\nRepository: ${config.repoUrl}\nBranches: ${config.branches.join(', ')}\n${sourceInstruction}\nInclude: ${includeList}\n\nPlease analyze the recent ${sourceLabel} from this repository and generate comprehensive documentation covering: project overview, technology stack, API reference, setup guide, development patterns, and changelog summary.`
+      const message = `Analyze the repository and generate comprehensive, FACTUAL project documentation for onboarding.
+
+CRITICAL WORKFLOW:
+1. FIRST — Direct the Code Reviewer to use GitHub tools to READ ACTUAL SOURCE CODE FILES from the repository. It must:
+   - List the repository directory structure
+   - Read package.json / requirements.txt / go.mod / pom.xml or similar manifest files to get the REAL technology stack
+   - Read actual route/controller files to find REAL API endpoints
+   - Read configuration files (.env.example, docker-compose.yml, Dockerfile, CI configs)
+   - Read key source files to understand the REAL architecture
+   - Cross-reference findings with the ${sourceLabel} history
+
+2. SECOND — Forward the Code Reviewer's FACTUAL analysis report to the Doc Writer. The Doc Writer must generate documentation based ONLY on what the Code Reviewer actually found in the code. No hallucination — only evidence-based content.
+
+Repository: ${config.repoUrl}
+Branches: ${config.branches.join(', ')}
+${sourceInstruction}
+Include sections: ${includeList}
+
+Generate comprehensive documentation covering: project overview, technology stack, API reference, setup guide, development patterns, and changelog summary. ALL content must be based on actual code files read from the repository.`
 
       const result = await callAIAgent(message, ONBOARDING_AGENT_ID)
 

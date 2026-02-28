@@ -1,7 +1,7 @@
 {
-  "agent_name": "Repository Onboarding Coordinator",
-  "agent_id": "69a277988e6d0e51fd5cd32f",
-  "description": "Coordinates the repository onboarding workflow — first directing the Code Reviewer to read and analyze actual repository source files, then forwarding the factual findings to the Doc Writer to generate accurate, evidence-based documentation.",
+  "agent_name": "Onboarding Doc Writer",
+  "agent_id": "69a289abbb857be96e3e208e",
+  "description": "Generates comprehensive, accurate project documentation based on factual code review data \u2014 including project overview, API reference, setup guide, and development patterns. Only documents what was actually found in the code.",
   "agent_type": "json",
   "accessor": "result",
   "auto_generated": true,
@@ -26,5 +26,13 @@
       "changelog_summary": "sample string",
       "full_readme": "sample string"
     }
+  },
+  "has_module_outputs": true,
+  "module_outputs_example": {
+    "artifact_files": [
+      {
+        "file_url": "https://example.com/file.pdf"
+      }
+    ]
   }
 }

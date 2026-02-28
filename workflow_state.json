@@ -50,13 +50,39 @@
     },
     "onboarding_agent": {
       "agent_id": "69a277988e6d0e51fd5cd32f",
-      "name": "Repository Onboarding Agent",
-      "type": "independent",
+      "name": "Repository Onboarding Coordinator",
+      "type": "manager",
       "provider": "openai",
       "model": "gpt-4.1",
       "temperature": 0.3,
       "top_p": 1,
-      "tools": ["github"]
+      "tools": ["github"],
+      "managed_agents": [
+        "69a289aabb857be96e3e208c",
+        "69a289abbb857be96e3e208e"
+      ]
+    },
+    "code_reviewer_agent": {
+      "agent_id": "69a289aabb857be96e3e208c",
+      "name": "Repository Code Reviewer",
+      "type": "sub-agent",
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "temperature": 0.1,
+      "top_p": 1,
+      "tools": ["github"],
+      "managed_by": "69a277988e6d0e51fd5cd32f"
+    },
+    "onboarding_doc_writer": {
+      "agent_id": "69a289abbb857be96e3e208e",
+      "name": "Onboarding Doc Writer",
+      "type": "sub-agent",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5",
+      "temperature": 0.3,
+      "top_p": 0.95,
+      "tools": [],
+      "managed_by": "69a277988e6d0e51fd5cd32f"
     }
   },
   "agent_ids": [
@@ -64,6 +90,8 @@
     "69a271a499680de146f8c165",
     "69a271e024f2adeb72b9fd14",
     "69a271e1f18a4f26754c8a98",
-    "69a277988e6d0e51fd5cd32f"
+    "69a277988e6d0e51fd5cd32f",
+    "69a289aabb857be96e3e208c",
+    "69a289abbb857be96e3e208e"
   ]
 }

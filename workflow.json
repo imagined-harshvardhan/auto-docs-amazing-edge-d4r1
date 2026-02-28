@@ -87,12 +87,12 @@
     {
       "id": "onboarding_agent",
       "type": "Agent",
-      "label": "Repository Onboarding Agent",
+      "label": "Repository Onboarding Coordinator",
       "nodeCategory": "agent",
       "agent_id": "69a277988e6d0e51fd5cd32f",
       "config": {
-        "name": "Repository Onboarding Agent",
-        "description": "Analyzes a repository's existing closed and merged pull requests to generate comprehensive project documentation including architecture overview, API reference, setup guide, technology stack summary, and development patterns",
+        "name": "Repository Onboarding Coordinator",
+        "description": "Coordinates the repository onboarding workflow — first directing the Code Reviewer to read and analyze actual repository source files, then forwarding the factual findings to the Doc Writer to generate accurate, evidence-based documentation.",
         "provider": "openai",
         "model": "gpt-4.1",
         "temperature": 0.3,
@@ -103,7 +103,46 @@
             "tool_source": "composio",
             "action_names": ["GITHUB_CREATE_A_PULL_REQUEST"]
           }
+        ],
+        "managed_agents": ["69a289aabb857be96e3e208c", "69a289abbb857be96e3e208e"]
+      }
+    },
+    {
+      "id": "code_reviewer_agent",
+      "type": "Agent",
+      "label": "Repository Code Reviewer",
+      "nodeCategory": "agent",
+      "agent_id": "69a289aabb857be96e3e208c",
+      "config": {
+        "name": "Repository Code Reviewer",
+        "description": "Reads actual repository code files, directory structures, configuration files, and cross-references them with PR diffs or commit history to produce a factual, evidence-based analysis of the codebase.",
+        "provider": "openai",
+        "model": "gpt-4.1",
+        "temperature": 0.1,
+        "top_p": 1,
+        "tools": [
+          {
+            "tool_name": "github",
+            "tool_source": "composio",
+            "action_names": ["GITHUB_CREATE_A_PULL_REQUEST"]
+          }
         ]
+      }
+    },
+    {
+      "id": "onboarding_doc_writer",
+      "type": "Agent",
+      "label": "Onboarding Doc Writer",
+      "nodeCategory": "agent",
+      "agent_id": "69a289abbb857be96e3e208e",
+      "config": {
+        "name": "Onboarding Doc Writer",
+        "description": "Generates comprehensive, accurate project documentation based on factual code review data — including project overview, API reference, setup guide, and development patterns. Only documents what was actually found in the code.",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-5",
+        "temperature": 0.3,
+        "top_p": 0.95,
+        "tools": []
       }
     },
     {
@@ -119,9 +158,12 @@
     { "source": "manager_agent", "target": "code_analysis_agent" },
     { "source": "manager_agent", "target": "doc_writer_agent" },
     { "source": "manager_agent", "target": "publisher_agent" },
+    { "source": "onboarding_agent", "target": "code_reviewer_agent" },
+    { "source": "onboarding_agent", "target": "onboarding_doc_writer" },
     { "source": "code_analysis_agent", "target": "output_node" },
     { "source": "doc_writer_agent", "target": "output_node" },
     { "source": "publisher_agent", "target": "output_node" },
-    { "source": "onboarding_agent", "target": "output_node" }
+    { "source": "code_reviewer_agent", "target": "output_node" },
+    { "source": "onboarding_doc_writer", "target": "output_node" }
   ]
 }

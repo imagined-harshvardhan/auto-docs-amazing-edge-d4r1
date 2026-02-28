@@ -156,15 +156,17 @@ const DOC_TABS: { key: keyof OnboardingResult['docs']; label: string; Icon: Reac
 const PROGRESS_STEPS_PR = [
   'Connecting to repository...',
   'Fetching closed PRs...',
-  'Analyzing PR history...',
-  'Generating documentation...',
+  'Reading source code files via Code Reviewer...',
+  'Cross-referencing code with PR changes...',
+  'Generating evidence-based documentation...',
 ]
 
 const PROGRESS_STEPS_COMMITS = [
   'Connecting to repository...',
   'Reading commit history...',
-  'Analyzing commit patterns...',
-  'Generating documentation...',
+  'Reading source code files via Code Reviewer...',
+  'Analyzing code patterns against commits...',
+  'Generating evidence-based documentation...',
 ]
 
 export default function OnboardingSection({
@@ -496,12 +498,12 @@ export default function OnboardingSection({
                   id="pr-count"
                   type="number"
                   min={1}
-                  max={config.sourceMode === 'commits' ? 100 : 50}
+                  max={config.sourceMode === 'commits' ? 1000 : 500}
                   value={config.prCount}
-                  onChange={(e) => setConfig(prev => ({ ...prev, prCount: Math.min(config.sourceMode === 'commits' ? 100 : 50, Math.max(1, parseInt(e.target.value) || 1)) }))}
-                  className="bg-secondary border-border w-24 text-sm"
+                  onChange={(e) => setConfig(prev => ({ ...prev, prCount: Math.min(config.sourceMode === 'commits' ? 1000 : 500, Math.max(1, parseInt(e.target.value) || 1)) }))}
+                  className="bg-secondary border-border w-28 text-sm"
                 />
-                <span className="text-xs text-muted-foreground">max {config.sourceMode === 'commits' ? 100 : 50}</span>
+                <span className="text-xs text-muted-foreground">max {config.sourceMode === 'commits' ? '1,000' : '500'}</span>
               </div>
             </div>
 
