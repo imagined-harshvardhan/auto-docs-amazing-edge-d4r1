@@ -1,0 +1,124 @@
+{
+  "agent_name": "Documentation Coordinator",
+  "agent_id": "69a271e024f2adeb72b9fd14",
+  "description": "Coordinates code analysis and documentation generation workflow; routes PR diff data to sub-agents and aggregates final documentation output",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "change_report": {
+      "summary": "string",
+      "total_changes": "number",
+      "categories": {
+        "api_endpoints": [
+          {
+            "file_path": "string",
+            "change_type": "string",
+            "description": "string",
+            "impact": "string"
+          }
+        ],
+        "schemas": [
+          {
+            "file_path": "string",
+            "change_type": "string",
+            "description": "string",
+            "impact": "string"
+          }
+        ],
+        "configs": [
+          {
+            "file_path": "string",
+            "change_type": "string",
+            "description": "string",
+            "impact": "string"
+          }
+        ],
+        "dependencies": [
+          {
+            "file_path": "string",
+            "change_type": "string",
+            "description": "string",
+            "impact": "string"
+          }
+        ],
+        "code_patterns": [
+          {
+            "file_path": "string",
+            "change_type": "string",
+            "description": "string",
+            "impact": "string"
+          }
+        ]
+      }
+    },
+    "documentation": {
+      "api_docs": "string",
+      "readme_sections": "string",
+      "changelog_entry": "string",
+      "summary": "string"
+    }
+  },
+  "example_response": {
+    "change_report": {
+      "summary": "sample string",
+      "total_changes": 0,
+      "categories": {
+        "api_endpoints": [
+          {
+            "file_path": "sample string",
+            "change_type": "sample string",
+            "description": "sample string",
+            "impact": "sample string"
+          }
+        ],
+        "schemas": [
+          {
+            "file_path": "sample string",
+            "change_type": "sample string",
+            "description": "sample string",
+            "impact": "sample string"
+          }
+        ],
+        "configs": [
+          {
+            "file_path": "sample string",
+            "change_type": "sample string",
+            "description": "sample string",
+            "impact": "sample string"
+          }
+        ],
+        "dependencies": [
+          {
+            "file_path": "sample string",
+            "change_type": "sample string",
+            "description": "sample string",
+            "impact": "sample string"
+          }
+        ],
+        "code_patterns": [
+          {
+            "file_path": "sample string",
+            "change_type": "sample string",
+            "description": "sample string",
+            "impact": "sample string"
+          }
+        ]
+      }
+    },
+    "documentation": {
+      "api_docs": "sample string",
+      "readme_sections": "sample string",
+      "changelog_entry": "sample string",
+      "summary": "sample string"
+    }
+  },
+  "has_module_outputs": true,
+  "module_outputs_example": {
+    "artifact_files": [
+      {
+        "file_url": "https://example.com/file.pdf"
+      }
+    ]
+  }
+}

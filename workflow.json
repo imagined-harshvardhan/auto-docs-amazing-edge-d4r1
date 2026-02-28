@@ -1,0 +1,103 @@
+{
+  "workflow_id": "docsync-automated-documentation",
+  "workflow_name": "DocSync Automated Documentation",
+  "nodes": [
+    {
+      "id": "input_node",
+      "type": "Input",
+      "label": "User Input",
+      "nodeCategory": "input"
+    },
+    {
+      "id": "manager_agent",
+      "type": "Agent",
+      "label": "Documentation Coordinator",
+      "nodeCategory": "agent",
+      "agent_id": "69a271e024f2adeb72b9fd14",
+      "config": {
+        "name": "Documentation Coordinator",
+        "description": "Coordinates code analysis and documentation generation workflow; routes PR diff data to sub-agents and aggregates final documentation output",
+        "provider": "openai",
+        "model": "gpt-4.1",
+        "temperature": 0.3,
+        "top_p": 1,
+        "managed_agents": ["69a271bbd56a3c78b8262a1a", "69a271a499680de146f8c165"]
+      }
+    },
+    {
+      "id": "code_analysis_agent",
+      "type": "Agent",
+      "label": "Code Analysis Agent",
+      "nodeCategory": "agent",
+      "agent_id": "69a271bbd56a3c78b8262a1a",
+      "config": {
+        "name": "Code Analysis Agent",
+        "description": "Parses PR diffs to identify changed API endpoints, function signatures, database schemas, config files, dependencies, and code patterns; produces structured change report",
+        "provider": "openai",
+        "model": "gpt-4.1",
+        "temperature": 0.2,
+        "top_p": 1,
+        "tools": [
+          {
+            "tool_name": "github",
+            "tool_source": "composio",
+            "action_names": ["GITHUB_CREATE_A_PULL_REQUEST"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "doc_writer_agent",
+      "type": "Agent",
+      "label": "Documentation Writer Agent",
+      "nodeCategory": "agent",
+      "agent_id": "69a271a499680de146f8c165",
+      "config": {
+        "name": "Documentation Writer Agent",
+        "description": "Generates updated API documentation sections, README content, and changelog entries based on the structured change report from Code Analysis Agent",
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-5",
+        "temperature": 0.4,
+        "top_p": 0.95,
+        "tools": []
+      }
+    },
+    {
+      "id": "publisher_agent",
+      "type": "Agent",
+      "label": "Documentation Publisher Agent",
+      "nodeCategory": "agent",
+      "agent_id": "69a271e1f18a4f26754c8a98",
+      "config": {
+        "name": "Documentation Publisher Agent",
+        "description": "Commits approved documentation updates back to the repository by creating a new branch and PR with the generated docs",
+        "provider": "openai",
+        "model": "gpt-4.1",
+        "temperature": 0.2,
+        "top_p": 1,
+        "tools": [
+          {
+            "tool_name": "github",
+            "tool_source": "composio",
+            "action_names": ["GITHUB_CREATE_A_PULL_REQUEST"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "output_node",
+      "type": "Output",
+      "label": "Output",
+      "nodeCategory": "end"
+    }
+  ],
+  "edges": [
+    { "source": "input_node", "target": "manager_agent" },
+    { "source": "manager_agent", "target": "code_analysis_agent" },
+    { "source": "manager_agent", "target": "doc_writer_agent" },
+    { "source": "manager_agent", "target": "publisher_agent" },
+    { "source": "code_analysis_agent", "target": "output_node" },
+    { "source": "doc_writer_agent", "target": "output_node" },
+    { "source": "publisher_agent", "target": "output_node" }
+  ]
+}

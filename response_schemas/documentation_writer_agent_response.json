@@ -1,0 +1,24 @@
+{
+  "agent_name": "Documentation Writer Agent",
+  "agent_id": "69a271a499680de146f8c165",
+  "description": "Generates updated API documentation sections, README content, and changelog entries based on the structured change report from Code Analysis Agent",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "documentation": {
+      "api_docs": "string",
+      "readme_sections": "string",
+      "changelog_entry": "string",
+      "summary": "string"
+    }
+  },
+  "example_response": {
+    "documentation": {
+      "api_docs": "sample string",
+      "readme_sections": "sample string",
+      "changelog_entry": "sample string",
+      "summary": "sample string"
+    }
+  }
+}

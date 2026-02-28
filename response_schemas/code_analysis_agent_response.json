@@ -1,0 +1,104 @@
+{
+  "agent_name": "Code Analysis Agent",
+  "agent_id": "69a271bbd56a3c78b8262a1a",
+  "description": "Parses PR diffs to identify changed API endpoints, function signatures, database schemas, config files, dependencies, and code patterns; produces structured change report",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "change_report": {
+      "summary": "string",
+      "total_changes": "number",
+      "categories": {
+        "api_endpoints": [
+          {
+            "file_path": "string",
+            "change_type": "string",
+            "description": "string",
+            "impact": "string"
+          }
+        ],
+        "schemas": [
+          {
+            "file_path": "string",
+            "change_type": "string",
+            "description": "string",
+            "impact": "string"
+          }
+        ],
+        "configs": [
+          {
+            "file_path": "string",
+            "change_type": "string",
+            "description": "string",
+            "impact": "string"
+          }
+        ],
+        "dependencies": [
+          {
+            "file_path": "string",
+            "change_type": "string",
+            "description": "string",
+            "impact": "string"
+          }
+        ],
+        "code_patterns": [
+          {
+            "file_path": "string",
+            "change_type": "string",
+            "description": "string",
+            "impact": "string"
+          }
+        ]
+      }
+    }
+  },
+  "example_response": {
+    "change_report": {
+      "summary": "sample string",
+      "total_changes": 0,
+      "categories": {
+        "api_endpoints": [
+          {
+            "file_path": "sample string",
+            "change_type": "sample string",
+            "description": "sample string",
+            "impact": "sample string"
+          }
+        ],
+        "schemas": [
+          {
+            "file_path": "sample string",
+            "change_type": "sample string",
+            "description": "sample string",
+            "impact": "sample string"
+          }
+        ],
+        "configs": [
+          {
+            "file_path": "sample string",
+            "change_type": "sample string",
+            "description": "sample string",
+            "impact": "sample string"
+          }
+        ],
+        "dependencies": [
+          {
+            "file_path": "sample string",
+            "change_type": "sample string",
+            "description": "sample string",
+            "impact": "sample string"
+          }
+        ],
+        "code_patterns": [
+          {
+            "file_path": "sample string",
+            "change_type": "sample string",
+            "description": "sample string",
+            "impact": "sample string"
+          }
+        ]
+      }
+    }
+  }
+}

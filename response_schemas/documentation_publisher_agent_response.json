@@ -1,0 +1,32 @@
+{
+  "agent_name": "Documentation Publisher Agent",
+  "agent_id": "69a271e1f18a4f26754c8a98",
+  "description": "Commits approved documentation updates back to the repository by creating a new branch and PR with the generated docs",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "publish_result": {
+      "status": "string",
+      "branch_name": "string",
+      "pr_url": "string",
+      "pr_number": "number",
+      "commit_message": "string",
+      "files_updated": [
+        "string"
+      ]
+    }
+  },
+  "example_response": {
+    "publish_result": {
+      "status": "sample string",
+      "branch_name": "sample string",
+      "pr_url": "sample string",
+      "pr_number": 0,
+      "commit_message": "sample string",
+      "files_updated": [
+        "sample string"
+      ]
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "workflow_id": "docsync-automated-documentation",
+  "workflow_name": "DocSync Automated Documentation",
+  "agents": {
+    "code_analysis_agent": {
+      "agent_id": "69a271bbd56a3c78b8262a1a",
+      "name": "Code Analysis Agent",
+      "type": "sub-agent",
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "temperature": 0.2,
+      "top_p": 1,
+      "tools": ["github"],
+      "managed_by": "69a271e024f2adeb72b9fd14"
+    },
+    "doc_writer_agent": {
+      "agent_id": "69a271a499680de146f8c165",
+      "name": "Documentation Writer Agent",
+      "type": "sub-agent",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5",
+      "temperature": 0.4,
+      "top_p": 0.95,
+      "tools": [],
+      "managed_by": "69a271e024f2adeb72b9fd14"
+    },
+    "manager_agent": {
+      "agent_id": "69a271e024f2adeb72b9fd14",
+      "name": "Documentation Coordinator",
+      "type": "manager",
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "temperature": 0.3,
+      "top_p": 1,
+      "tools": [],
+      "managed_agents": [
+        "69a271bbd56a3c78b8262a1a",
+        "69a271a499680de146f8c165"
+      ]
+    },
+    "publisher_agent": {
+      "agent_id": "69a271e1f18a4f26754c8a98",
+      "name": "Documentation Publisher Agent",
+      "type": "independent",
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "temperature": 0.2,
+      "top_p": 1,
+      "tools": ["github"]
+    }
+  },
+  "agent_ids": [
+    "69a271bbd56a3c78b8262a1a",
+    "69a271a499680de146f8c165",
+    "69a271e024f2adeb72b9fd14",
+    "69a271e1f18a4f26754c8a98"
+  ]
+}
