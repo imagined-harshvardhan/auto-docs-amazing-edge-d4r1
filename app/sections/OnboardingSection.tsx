@@ -29,10 +29,13 @@ import {
   VscRefresh,
 } from 'react-icons/vsc'
 
+export type SourceMode = 'pull_requests' | 'commits'
+
 export interface OnboardingConfig {
   repoUrl: string
   prCount: number
   branches: string[]
+  sourceMode: SourceMode
   includeOptions: {
     architecture: boolean
     apiReference: boolean
@@ -56,6 +59,7 @@ export interface OnboardingResult {
   analyzed_at: string
   prs_analyzed: number
   repo_url: string
+  source_mode: SourceMode
 }
 
 interface PublishResult {
@@ -119,6 +123,7 @@ const DEFAULT_CONFIG: OnboardingConfig = {
   repoUrl: '',
   prCount: 20,
   branches: ['main'],
+  sourceMode: 'pull_requests',
   includeOptions: {
     architecture: true,
     apiReference: true,
@@ -148,10 +153,17 @@ const DOC_TABS: { key: keyof OnboardingResult['docs']; label: string; Icon: Reac
   { key: 'full_readme', label: 'Full README', Icon: VscDesktopDownload },
 ]
 
-const PROGRESS_STEPS = [
+const PROGRESS_STEPS_PR = [
   'Connecting to repository...',
   'Fetching closed PRs...',
   'Analyzing PR history...',
+  'Generating documentation...',
+]
+
+const PROGRESS_STEPS_COMMITS = [
+  'Connecting to repository...',
+  'Reading commit history...',
+  'Analyzing commit patterns...',
   'Generating documentation...',
 ]
 
@@ -170,6 +182,8 @@ export default function OnboardingSection({
   const [activeDocTab, setActiveDocTab] = React.useState<string>('project_overview')
   const [progressStep, setProgressStep] = React.useState(0)
 
+  const progressSteps = config.sourceMode === 'commits' ? PROGRESS_STEPS_COMMITS : PROGRESS_STEPS_PR
+
   React.useEffect(() => {
     if (!isAnalyzing) {
       setProgressStep(0)
@@ -178,12 +192,12 @@ export default function OnboardingSection({
     setProgressStep(0)
     const interval = setInterval(() => {
       setProgressStep(prev => {
-        if (prev < PROGRESS_STEPS.length - 1) return prev + 1
+        if (prev < progressSteps.length - 1) return prev + 1
         return prev
       })
     }, 2800)
     return () => clearInterval(interval)
-  }, [isAnalyzing])
+  }, [isAnalyzing, progressSteps.length])
 
   const handleAddBranch = () => {
     const trimmed = branchInput.trim()
@@ -248,7 +262,7 @@ export default function OnboardingSection({
             </div>
 
             <div className="space-y-4 mb-6">
-              {PROGRESS_STEPS.map((step, idx) => {
+              {progressSteps.map((step, idx) => {
                 const isDone = idx < progressStep
                 const isActive = idx === progressStep
                 return (
@@ -273,7 +287,7 @@ export default function OnboardingSection({
             <Separator className="my-4" />
 
             <div className="space-y-2">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-2">Discovering PRs...</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-2">{config.sourceMode === 'commits' ? 'Reading commits...' : 'Discovering PRs...'}</p>
               <Skeleton className="h-4 w-full bg-muted" />
               <Skeleton className="h-4 w-4/5 bg-muted" />
               <Skeleton className="h-4 w-3/5 bg-muted" />
@@ -301,7 +315,7 @@ export default function OnboardingSection({
             <div>
               <h2 className="text-lg font-serif font-semibold">Onboarding Documentation</h2>
               <p className="text-xs text-muted-foreground">
-                {analysisResult.prs_analyzed ?? 0} PRs analyzed from{' '}
+                {analysisResult.prs_analyzed ?? 0} {analysisResult.source_mode === 'commits' ? 'commits' : 'PRs'} analyzed from{' '}
                 <span className="font-mono text-accent">{analysisResult.repo_url ?? '--'}</span>
                 {' '}| Generated {analysisResult.analyzed_at ?? '--'}
               </p>
@@ -416,7 +430,7 @@ export default function OnboardingSection({
         <Separator orientation="vertical" className="h-6" />
         <div>
           <h2 className="text-2xl font-serif font-semibold tracking-tight">Repository Onboarding</h2>
-          <p className="text-sm text-muted-foreground mt-1">Generate comprehensive project documentation by analyzing your repository's PR history</p>
+          <p className="text-sm text-muted-foreground mt-1">Generate comprehensive project documentation by analyzing your repository's PR history or commit log</p>
         </div>
       </div>
 
@@ -442,20 +456,52 @@ export default function OnboardingSection({
               />
             </div>
 
-            {/* PR Count */}
+            {/* Source Mode */}
             <div className="space-y-2">
-              <Label htmlFor="pr-count" className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Number of Recent Closed PRs to Analyze</Label>
+              <Label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Analysis Source</Label>
+              <p className="text-xs text-muted-foreground mb-2">Choose what to analyze. Use commits if the repo has no PRs.</p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setConfig(prev => ({ ...prev, sourceMode: 'pull_requests' }))}
+                  className={`flex items-center gap-2.5 px-3 py-3 rounded-lg border text-sm transition-all duration-200 ${config.sourceMode === 'pull_requests' ? 'border-accent bg-accent/10 text-accent' : 'border-border bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground'}`}
+                >
+                  <VscGitPullRequest className="h-4 w-4 flex-shrink-0" />
+                  <div className="text-left">
+                    <span className="font-medium block text-xs">Pull Requests</span>
+                    <span className="text-[10px] opacity-70">Closed / merged PRs</span>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfig(prev => ({ ...prev, sourceMode: 'commits' }))}
+                  className={`flex items-center gap-2.5 px-3 py-3 rounded-lg border text-sm transition-all duration-200 ${config.sourceMode === 'commits' ? 'border-accent bg-accent/10 text-accent' : 'border-border bg-secondary/50 text-muted-foreground hover:bg-secondary hover:text-foreground'}`}
+                >
+                  <VscGitCommit className="h-4 w-4 flex-shrink-0" />
+                  <div className="text-left">
+                    <span className="font-medium block text-xs">Commits</span>
+                    <span className="text-[10px] opacity-70">Direct commit history</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Count */}
+            <div className="space-y-2">
+              <Label htmlFor="pr-count" className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
+                {config.sourceMode === 'commits' ? 'Number of Recent Commits to Analyze' : 'Number of Recent Closed PRs to Analyze'}
+              </Label>
               <div className="flex items-center gap-3">
                 <Input
                   id="pr-count"
                   type="number"
                   min={1}
-                  max={50}
+                  max={config.sourceMode === 'commits' ? 100 : 50}
                   value={config.prCount}
-                  onChange={(e) => setConfig(prev => ({ ...prev, prCount: Math.min(50, Math.max(1, parseInt(e.target.value) || 1)) }))}
+                  onChange={(e) => setConfig(prev => ({ ...prev, prCount: Math.min(config.sourceMode === 'commits' ? 100 : 50, Math.max(1, parseInt(e.target.value) || 1)) }))}
                   className="bg-secondary border-border w-24 text-sm"
                 />
-                <span className="text-xs text-muted-foreground">max 50</span>
+                <span className="text-xs text-muted-foreground">max {config.sourceMode === 'commits' ? 100 : 50}</span>
               </div>
             </div>
 

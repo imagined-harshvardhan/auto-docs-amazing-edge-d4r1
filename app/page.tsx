@@ -13,7 +13,7 @@ import type { HistoryEntry } from './sections/HistorySection'
 import SettingsSection from './sections/SettingsSection'
 import type { AppSettings } from './sections/SettingsSection'
 import OnboardingSection from './sections/OnboardingSection'
-import type { OnboardingConfig, OnboardingResult } from './sections/OnboardingSection'
+import type { OnboardingConfig, OnboardingResult, SourceMode } from './sections/OnboardingSection'
 
 const COORDINATOR_AGENT_ID = '69a271e024f2adeb72b9fd14'
 const PUBLISHER_AGENT_ID = '69a271e1f18a4f26754c8a98'
@@ -228,7 +228,12 @@ export default function Page() {
         .map(([k]) => k)
         .join(', ')
 
-      const message = `Analyze the repository and generate comprehensive project documentation for onboarding.\n\nRepository: ${config.repoUrl}\nBranches: ${config.branches.join(', ')}\nNumber of recent closed PRs to analyze: ${config.prCount}\nInclude: ${includeList}\n\nPlease analyze the recent merged/closed PRs from this repository and generate comprehensive documentation covering: project overview, technology stack, API reference, setup guide, development patterns, and changelog summary.`
+      const sourceLabel = config.sourceMode === 'commits' ? 'commits' : 'closed PRs'
+      const sourceInstruction = config.sourceMode === 'commits'
+        ? `Source Mode: commits\nIMPORTANT: This repository may have no pull requests. Read the recent commit history directly instead. Analyze commit messages, changed files, and patterns in the last ${config.prCount} commits to build documentation.\n\nNumber of recent commits to analyze: ${config.prCount}`
+        : `Source Mode: pull_requests\nNumber of recent closed PRs to analyze: ${config.prCount}`
+
+      const message = `Analyze the repository and generate comprehensive project documentation for onboarding.\n\nRepository: ${config.repoUrl}\nBranches: ${config.branches.join(', ')}\n${sourceInstruction}\nInclude: ${includeList}\n\nPlease analyze the recent ${sourceLabel} from this repository and generate comprehensive documentation covering: project overview, technology stack, API reference, setup guide, development patterns, and changelog summary.`
 
       const result = await callAIAgent(message, ONBOARDING_AGENT_ID)
 
@@ -249,6 +254,7 @@ export default function Page() {
           analyzed_at: new Date().toLocaleString(),
           prs_analyzed: config.prCount,
           repo_url: config.repoUrl,
+          source_mode: config.sourceMode,
         })
       } else {
         setAgentError(result?.error ?? 'Onboarding analysis failed')
