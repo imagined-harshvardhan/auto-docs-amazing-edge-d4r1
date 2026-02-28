@@ -1,4 +1,4 @@
-DocSync UI build completed successfully.
+DocSync UI build completed successfully (Iteration 2 - Onboarding feature).
 
 Files created/modified:
 - /app/nextjs-project/app/globals.css (Heritage Dark theme)
@@ -6,4 +6,5 @@ Files created/modified:
 - /app/nextjs-project/app/sections/ReviewSection.tsx
 - /app/nextjs-project/app/sections/HistorySection.tsx
 - /app/nextjs-project/app/sections/SettingsSection.tsx
-- /app/nextjs-project/app/page.tsx (composition shell)
+- /app/nextjs-project/app/sections/OnboardingSection.tsx (NEW)
+- /app/nextjs-project/app/page.tsx (updated with onboarding nav, state, handlers)

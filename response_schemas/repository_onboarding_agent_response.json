@@ -1,0 +1,30 @@
+{
+  "agent_name": "Repository Onboarding Agent",
+  "agent_id": "69a277988e6d0e51fd5cd32f",
+  "description": "Analyzes a repository's existing closed and merged pull requests to generate comprehensive project documentation including architecture overview, API reference, setup guide, technology stack summary, and development patterns \u2014 ideal for new team member onboarding.",
+  "agent_type": "json",
+  "accessor": "result",
+  "auto_generated": true,
+  "response_schema": {
+    "onboarding_docs": {
+      "project_overview": "string",
+      "technology_stack": "string",
+      "api_reference": "string",
+      "setup_guide": "string",
+      "development_patterns": "string",
+      "changelog_summary": "string",
+      "full_readme": "string"
+    }
+  },
+  "example_response": {
+    "onboarding_docs": {
+      "project_overview": "sample string",
+      "technology_stack": "sample string",
+      "api_reference": "sample string",
+      "setup_guide": "sample string",
+      "development_patterns": "sample string",
+      "changelog_summary": "sample string",
+      "full_readme": "sample string"
+    }
+  }
+}

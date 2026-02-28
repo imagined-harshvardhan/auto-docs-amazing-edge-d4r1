@@ -85,6 +85,28 @@
       }
     },
     {
+      "id": "onboarding_agent",
+      "type": "Agent",
+      "label": "Repository Onboarding Agent",
+      "nodeCategory": "agent",
+      "agent_id": "69a277988e6d0e51fd5cd32f",
+      "config": {
+        "name": "Repository Onboarding Agent",
+        "description": "Analyzes a repository's existing closed and merged pull requests to generate comprehensive project documentation including architecture overview, API reference, setup guide, technology stack summary, and development patterns",
+        "provider": "openai",
+        "model": "gpt-4.1",
+        "temperature": 0.3,
+        "top_p": 1,
+        "tools": [
+          {
+            "tool_name": "github",
+            "tool_source": "composio",
+            "action_names": ["GITHUB_CREATE_A_PULL_REQUEST"]
+          }
+        ]
+      }
+    },
+    {
       "id": "output_node",
       "type": "Output",
       "label": "Output",
@@ -93,11 +115,13 @@
   ],
   "edges": [
     { "source": "input_node", "target": "manager_agent" },
+    { "source": "input_node", "target": "onboarding_agent" },
     { "source": "manager_agent", "target": "code_analysis_agent" },
     { "source": "manager_agent", "target": "doc_writer_agent" },
     { "source": "manager_agent", "target": "publisher_agent" },
     { "source": "code_analysis_agent", "target": "output_node" },
     { "source": "doc_writer_agent", "target": "output_node" },
-    { "source": "publisher_agent", "target": "output_node" }
+    { "source": "publisher_agent", "target": "output_node" },
+    { "source": "onboarding_agent", "target": "output_node" }
   ]
 }

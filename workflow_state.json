@@ -47,12 +47,23 @@
       "temperature": 0.2,
       "top_p": 1,
       "tools": ["github"]
+    },
+    "onboarding_agent": {
+      "agent_id": "69a277988e6d0e51fd5cd32f",
+      "name": "Repository Onboarding Agent",
+      "type": "independent",
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "temperature": 0.3,
+      "top_p": 1,
+      "tools": ["github"]
     }
   },
   "agent_ids": [
     "69a271bbd56a3c78b8262a1a",
     "69a271a499680de146f8c165",
     "69a271e024f2adeb72b9fd14",
-    "69a271e1f18a4f26754c8a98"
+    "69a271e1f18a4f26754c8a98",
+    "69a277988e6d0e51fd5cd32f"
   ]
 }

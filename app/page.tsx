@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react'
 import { callAIAgent } from '@/lib/aiAgent'
-import { VscDashboard, VscHistory, VscSettingsGear, VscMenu, VscChromeClose, VscGitCommit } from 'react-icons/vsc'
+import { VscDashboard, VscHistory, VscSettingsGear, VscMenu, VscChromeClose, VscGitCommit, VscRepo } from 'react-icons/vsc'
 
 import DashboardSection from './sections/DashboardSection'
 import type { MergedPR } from './sections/DashboardSection'
@@ -12,9 +12,12 @@ import HistorySection from './sections/HistorySection'
 import type { HistoryEntry } from './sections/HistorySection'
 import SettingsSection from './sections/SettingsSection'
 import type { AppSettings } from './sections/SettingsSection'
+import OnboardingSection from './sections/OnboardingSection'
+import type { OnboardingConfig, OnboardingResult } from './sections/OnboardingSection'
 
 const COORDINATOR_AGENT_ID = '69a271e024f2adeb72b9fd14'
 const PUBLISHER_AGENT_ID = '69a271e1f18a4f26754c8a98'
+const ONBOARDING_AGENT_ID = '69a277988e6d0e51fd5cd32f'
 
 class ErrorBoundary extends React.Component<
   { children: React.ReactNode },
@@ -75,10 +78,11 @@ const DEFAULT_SETTINGS: AppSettings = {
   outputFormat: 'markdown',
 }
 
-type Screen = 'dashboard' | 'review' | 'history' | 'settings'
+type Screen = 'dashboard' | 'review' | 'history' | 'settings' | 'onboarding'
 
 const NAV_ITEMS: { key: Screen; label: string; Icon: React.ComponentType<{ className?: string }> }[] = [
   { key: 'dashboard', label: 'Dashboard', Icon: VscDashboard },
+  { key: 'onboarding', label: 'Onboarding', Icon: VscRepo },
   { key: 'history', label: 'History', Icon: VscHistory },
   { key: 'settings', label: 'Settings', Icon: VscSettingsGear },
 ]
@@ -86,6 +90,7 @@ const NAV_ITEMS: { key: Screen; label: string; Icon: React.ComponentType<{ class
 const AGENTS = [
   { id: COORDINATOR_AGENT_ID, name: 'Documentation Coordinator', purpose: 'Analyzes PR diffs and generates documentation' },
   { id: PUBLISHER_AGENT_ID, name: 'Documentation Publisher', purpose: 'Commits documentation updates to repository' },
+  { id: ONBOARDING_AGENT_ID, name: 'Repository Onboarding', purpose: 'Generates project docs from PR history' },
 ]
 
 export default function Page() {
@@ -102,6 +107,8 @@ export default function Page() {
   const [showSampleData, setShowSampleData] = useState(false)
   const [activeAgentId, setActiveAgentId] = useState<string | null>(null)
   const [agentError, setAgentError] = useState<string | null>(null)
+  const [onboardingResult, setOnboardingResult] = useState<OnboardingResult | null>(null)
+  const [isOnboarding, setIsOnboarding] = useState(false)
 
   const handleAnalyzePR = useCallback(async (pr: MergedPR) => {
     setSelectedPR(pr)
@@ -210,6 +217,82 @@ export default function Page() {
     setActiveScreen('dashboard')
   }, [])
 
+  const handleStartOnboarding = useCallback(async (config: OnboardingConfig) => {
+    setIsOnboarding(true)
+    setActiveAgentId(ONBOARDING_AGENT_ID)
+    setAgentError(null)
+
+    try {
+      const includeList = Object.entries(config.includeOptions)
+        .filter(([, v]) => v)
+        .map(([k]) => k)
+        .join(', ')
+
+      const message = `Analyze the repository and generate comprehensive project documentation for onboarding.\n\nRepository: ${config.repoUrl}\nBranches: ${config.branches.join(', ')}\nNumber of recent closed PRs to analyze: ${config.prCount}\nInclude: ${includeList}\n\nPlease analyze the recent merged/closed PRs from this repository and generate comprehensive documentation covering: project overview, technology stack, API reference, setup guide, development patterns, and changelog summary.`
+
+      const result = await callAIAgent(message, ONBOARDING_AGENT_ID)
+
+      if (result.success) {
+        const data = result?.response?.result as Record<string, unknown> | undefined
+        const docs = (data?.onboarding_docs as Record<string, unknown>) ?? data ?? {}
+
+        setOnboardingResult({
+          docs: {
+            project_overview: (docs?.project_overview as string) ?? '',
+            technology_stack: (docs?.technology_stack as string) ?? '',
+            api_reference: (docs?.api_reference as string) ?? '',
+            setup_guide: (docs?.setup_guide as string) ?? '',
+            development_patterns: (docs?.development_patterns as string) ?? '',
+            changelog_summary: (docs?.changelog_summary as string) ?? '',
+            full_readme: (docs?.full_readme as string) ?? '',
+          },
+          analyzed_at: new Date().toLocaleString(),
+          prs_analyzed: config.prCount,
+          repo_url: config.repoUrl,
+        })
+      } else {
+        setAgentError(result?.error ?? 'Onboarding analysis failed')
+      }
+    } catch (err) {
+      setAgentError(err instanceof Error ? err.message : 'Unexpected error')
+    } finally {
+      setIsOnboarding(false)
+      setActiveAgentId(null)
+    }
+  }, [])
+
+  const handleCommitOnboardingDocs = useCallback(async (docs: OnboardingResult['docs']) => {
+    setIsPublishing(true)
+    setActiveAgentId(PUBLISHER_AGENT_ID)
+    setPublishError(null)
+    setPublishResult(null)
+
+    try {
+      const message = `Commit these comprehensive project documentation files to the repository:\n\nRepository: ${settings.repoUrl}\nBranch: docs/onboarding-docs\n\nDocumentation Content:\n${JSON.stringify(docs, null, 2)}\n\nPlease create a PR with all the generated documentation files including README.md, docs/architecture.md, docs/api-reference.md, docs/setup-guide.md, docs/development-patterns.md, and CHANGELOG.md.`
+      const result = await callAIAgent(message, PUBLISHER_AGENT_ID)
+
+      if (result.success) {
+        const data = result?.response?.result as Record<string, unknown> | undefined
+        const pub = (data?.publish_result as Record<string, unknown>) ?? data ?? {}
+        setPublishResult({
+          status: (pub?.status as string) ?? 'success',
+          branch_name: (pub?.branch_name as string) ?? '',
+          pr_url: (pub?.pr_url as string) ?? '',
+          pr_number: (pub?.pr_number as number) ?? 0,
+          commit_message: (pub?.commit_message as string) ?? '',
+          files_updated: Array.isArray(pub?.files_updated) ? pub.files_updated as string[] : [],
+        })
+      } else {
+        setPublishError(result?.error ?? 'Publish failed')
+      }
+    } catch (err) {
+      setPublishError(err instanceof Error ? err.message : 'Unexpected error')
+    } finally {
+      setIsPublishing(false)
+      setActiveAgentId(null)
+    }
+  }, [settings.repoUrl])
+
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background text-foreground flex">
@@ -304,6 +387,19 @@ export default function Page() {
 
           {activeScreen === 'settings' && (
             <SettingsSection settings={settings} onSettingsChange={setSettings} />
+          )}
+
+          {activeScreen === 'onboarding' && (
+            <OnboardingSection
+              isAnalyzing={isOnboarding}
+              onStartAnalysis={handleStartOnboarding}
+              analysisResult={onboardingResult}
+              onCommitDocs={handleCommitOnboardingDocs}
+              isPublishing={isPublishing}
+              publishResult={publishResult}
+              publishError={publishError}
+              onBackToDashboard={() => { setOnboardingResult(null); setActiveScreen('dashboard') }}
+            />
           )}
         </main>
       </div>
